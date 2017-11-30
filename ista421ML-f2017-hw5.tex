@@ -1,0 +1,300 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     Declarations (skip to Begin Document, line 112, for parts you fill in)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt]{article}
+
+\usepackage{geometry}  % Lots of layout options.  See http://en.wikibooks.org/wiki/LaTeX/Page_Layout
+\geometry{letterpaper}  % ... or a4paper or a5paper or ... 
+\usepackage{fullpage}  % somewhat standardized smaller margins (around an inch)
+\usepackage{setspace}  % control line spacing in latex documents
+\usepackage[parfill]{parskip}  % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{hyperref}
+
+
+\usepackage{amsmath,amssymb}  % latex math
+\usepackage{empheq} % http://www.ctan.org/pkg/empheq
+\usepackage{bm,upgreek}  % allows you to write bold greek letters (upper & lower case)
+
+% for typsetting algorithm pseudocode see http://en.wikibooks.org/wiki/LaTeX/Algorithms_and_Pseudocode
+\usepackage{algorithm}  
+
+\usepackage{graphicx}  % inclusion of graphics; see: http://en.wikibooks.org/wiki/LaTeX/Importing_Graphics
+% allow easy inclusion of .tif, .png graphics
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\usepackage{xspace}
+\newcommand{\latex}{\LaTeX\xspace}
+
+\usepackage{color}  % http://en.wikibooks.org/wiki/LaTeX/Colors
+
+\long\def\ans#1{{\color{blue}{\em #1}}}
+\long\def\ansnem#1{{\color{blue}#1}}
+\long\def\boldred#1{{\color{red}{\bf #1}}}
+
+% Useful package for syntax highlighting of specific code (such as python) -- see below
+\usepackage{listings}  % http://en.wikibooks.org/wiki/LaTeX/Packages/Listings
+\usepackage{textcomp}
+
+%%% The following lines set up using the listings package
+\renewcommand{\lstlistlistingname}{Code Listings}
+\renewcommand{\lstlistingname}{Code Listing}
+
+%%% Specific for python listings
+\definecolor{gray}{gray}{0.5}
+\definecolor{green}{rgb}{0,0.5,0}
+
+\lstnewenvironment{python}[1][]{
+\lstset{
+language=python,
+basicstyle=\footnotesize,  % could also use this -- a little larger \ttfamily\small\setstretch{1},
+stringstyle=\color{red},
+showstringspaces=false,
+alsoletter={1234567890},
+otherkeywords={\ , \}, \{},
+keywordstyle=\color{blue},
+emph={access,and,break,class,continue,def,del,elif ,else,%
+except,exec,finally,for,from,global,if,import,in,i s,%
+lambda,not,or,pass,print,raise,return,try,while},
+emphstyle=\color{black}\bfseries,
+emph={[2]True, False, None, self},
+emphstyle=[2]\color{green},
+emph={[3]from, import, as},
+emphstyle=[3]\color{blue},
+upquote=true,
+morecomment=[s]{"""}{"""},
+commentstyle=\color{gray}\slshape,
+emph={[4]1, 2, 3, 4, 5, 6, 7, 8, 9, 0},
+emphstyle=[4]\color{blue},
+literate=*{:}{{\textcolor{blue}:}}{1}%
+{=}{{\textcolor{blue}=}}{1}%
+{-}{{\textcolor{blue}-}}{1}%
+{+}{{\textcolor{blue}+}}{1}%
+{*}{{\textcolor{blue}*}}{1}%
+{!}{{\textcolor{blue}!}}{1}%
+{(}{{\textcolor{blue}(}}{1}%
+{)}{{\textcolor{blue})}}{1}%
+{[}{{\textcolor{blue}[}}{1}%
+{]}{{\textcolor{blue}]}}{1}%
+{<}{{\textcolor{blue}<}}{1}%
+{>}{{\textcolor{blue}>}}{1},%
+%framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox, rulesepcolor=\color{blue},#1
+framexleftmargin=1mm, framextopmargin=1mm, frame=single,#1
+}}{}
+%%% End python code listing definitions
+
+%%% Specific for matlab listings
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ 
+\lstnewenvironment{matlab}[1][]{
+\lstset{ %
+  language=Matlab,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=t,                   % sets the caption-position to top
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={*,...}               % if you want to add more keywords to the set
+  framexleftmargin=1mm, framextopmargin=1mm, frame=single,#1 % display caption
+} }{}
+%%% End matlab code listing definitions
+
+\usepackage{color}  % http://en.wikibooks.org/wiki/LaTeX/Colors
+\long\def\todo#1{{\color{red}{\bf TODO: #1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%     Begin Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{center}
+    {\Large {\bf ISTA 421/521 -- Homework 5}} \\
+    \boldred{Due: Thursday, December 7, 5pm} \\
+    30 points total
+    
+\end{center}
+
+\begin{flushright}
+STUDENT NAME %% Fill in your name here
+
+Undergraduate / Graduate %% select which you are!
+\end{flushright}
+
+\vspace{1cm}
+{\Large {\bf Instructions}}
+
+In this assignment you will work directly with the following three python scripts: {\tt utils.py}, {\tt train\_autoecoder.py}, and {\tt gradient.py}. You will fill in portions of these files that are currently unimplemented, following the instructions in the exercises, and you will include all three in your final submission.
+
+Also included in the released code are the following auxiliary files, which should appear in the same directory: {\tt load\_MNIST.py} and {\tt visualize.py}.  You will not make any changes to these files.
+
+We will use a database from the MNIST dataset, which you can get here:
+\begin{itemize}
+\item Training Images: \url{http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz}\\Uncompresses to 45MB
+\end{itemize}
+
+The top-level script to run is {\tt train\_autoencoder.py}.  
+Initially, many parts of the script will not yet run as the functions they call are not yet implemented.
+On lines 15-19 are global flag variables to control the execution of portions of the script.  Initially all are set to False.  You will generally proceed in order through the exercises below, setting them to True as you implement the required functionality.  After completing steps 1-4, you can set them to False and just set {\tt RUN\_STEP\_5\_TRAIN\_AUTOENCODER} to True.  You will want to revisit running steps 3 and 4 to test your implementation of {\tt autoencoder\_cost\_and\_grad\_sparse()} in exercise 6.
+
+We have provided the function {\tt load\_MNIST\_images} in {\tt load\_MNIST.py} to load the MNIST image files into memory.  Be sure to adjust the appropriate filepaths so that they point to where you have saved the MNIST data.
+
+Some problems require you to include plots of the weights and decoded output that you learn with the autoencoder.  The helper function {\tt utils.plot\_and\_save\_results} is provided to help with saving the model (the theta values and model parameters), extracting the first layer weights and ploting them (each patch in the resulting grid image corresponds to the weights associated with each hidden node).  The function also optionally feeds-forward the first 100 training patches, and if provided, 100 patches the network has not seen before, and generates a plot of what the autoencoder is able to decode for these patches.  In order to use the function you will need to implement the functionality needed to train a network as well as the stand-alone {\tt utils.autoencoder\_feedforward} function, which you will complete in Exercise 4.
+
+These problems are adapted from the UFDL demo/tutorial from Stanford:\\
+\url{http://ufldl.stanford.edu/wiki/index.php/Neural_Networks}. \\
+You can follow the tutorial to walk you through your implementation.
+
+NOTE: You will see that in the code the steps of this tutorial are numbered, to indicate the steps of implementing the NN framework; These steps will be referred to in the exercise descriptions, to clarify which part of the code you'll be working on.
+
+\vspace{.5cm}
+
+%%%%%%%%%%%%%%%%
+%%%     Problems
+%%%%%%%%%%%%%%%%
+
+\newpage
+\begin{itemize}
+
+
+
+%%%     Exercise 1
+\item[1.] [1 points]  Exercise 1, Warmup: Load and visualize MNIST:  
+
+You will need the files {\tt visualize.py} and {\tt load\_MNIST.py} in the {\em same} directory.
+Execute \\{\tt train\_autoencoder.py} to load and visualize the MNIST dataset.  
+Currently the code loads 100 images into {\tt patches\_train} and plots them (in Step 0).
+
+Modify the script {\tt train\_autoencoder.py} so you plot the first 10, 50 and 100 {\tt patches\_train}.  The function {\tt plot\_images} takes an optional filepath (string), which when specified will save the .png image to the filepath.  Include in your written solution a figure for each of the three subsets (each with a caption!).  Also plot the 100 {\tt patches\_test}.  These will be used later to qualitatively assess how well your trained autoencoder does in encoding and decoding images it has not been trained on -- you'll want to see these original images in order to compare against what your autoencoder produces.
+
+{\bf Solution:}
+
+
+
+%%%     Exercise 2
+\item[2.] [3 points]
+Exercise 2:  
+Write the initialization script for the parameters in an autoencoder with a single hidden layer.
+
+You will implement this functionality in the function {\tt initialize} in {\tt utils.py}  \\
+(found in the script {\tt train\_autoencoder.py}, this exercise comprises Step 2).
+
+In class we learned that a NN's parameters $\theta$ are the weights $W_{ij}^{(l)}$ and the offset (bias) parameters $b_i^{(l)}$.  Write the script so that you initialize them given the size of the hidden layer and the visible layer. 	
+Then reshape them and concatenate them so they are all allocated in a single parameter vector.  
+
+Example: For an autoencoder with visible layer size 2 and hidden size 3, we would have 6 weights from the visible layer to the hidden layer (comprising the parameters in the weight matrix at layer 1: $W^{(1)}$) and 6 more weights from the hidden layer to the output layer (comprising the parameters in the weight matrix at layer 2: $W^{(2)}$).  There are also vectors of bias weights, one for layer 1 ($b^{(1)}$) with one bias weight parameter for each of the hidden nodes (3 bias weights), and another for layer 2 ($b^{(2)}$) with 2 bias weight parameters for each node at the output layer. This will make a total of 6+6+3+2 = 17 parameters. The output of your initialize function should be an array of 17 elements, with order [$\{W^{(1)}\}$, $\{W^{(2)}\}$, $\{b^{(1)}\}$, $\{b^{(2)}\}$].  
+
+Tip: You can use the {\tt np.concatenate} function to concatenate arrays in the desired order.  
+
+
+
+%%%     Exercise 3
+\item[3.] [14 points]
+Exercise 3:  
+Implement a function for the cost of a 3-layer perceptron (which includes the case of an autoencoder) as well as the gradient for each of the parameters.
+  
+In this exercise you will work on implementing two functions: {\tt autoencoder\_cost\_and\_grad()} in {\tt utils.py} and {\tt compute\_gradient\_numerical\_estimate()} in {\tt gradient.py}.  (In the script\\ {\tt train\_autoencoder.py}, this exercise comprises Steps 3 and 4.)
+
+In class we learned that we can use gradient descent to train a multi-layer perceptron NN using Backpropagation.  In this exercise we will implement the core of the Backpropagation computation.  However, we will use a more refined version of gradient descent called L-BFGS-B (\url{http://en.wikipedia.org/wiki/Limited-memory_BFGS}), which is readily implemented in the optimization library of scipy:
+
+\hspace{2cm}{\tt scipy.optimize.minimize(..., method='L-BFGS-B', ...)}
+
+For convenience, the {\tt train\_autoencoder.py} script is already set up to run \\ {\tt scipy.optimize.minimize} later.  
+
+To obtain the information needed to use {\tt scipy.optimize.minimize}, you need to implement \\ {\tt autoencoder\_cost\_and\_grad()}, which will compute both the {\tt cost} (i.e., loss) and {\tt grad} (gradient) (Step 3).  {\tt autoencoder\_cost\_and\_grad()} will use the data to compute the forward pass resulting in the network output, calculate the overall error ({\tt cost}), and then calculate the gradient ({\tt grad}) for each parameter using the error backpropagation of Backprop Core.  Note that you will need to extract from the {\tt theta} array the weights and bias parameters for each layer, as you constructed them in the {\tt initialize} function in Exercise 2.  You will likely want to use the numpy {\tt reshape} method.
+
+The gradient array has to be the same size as the theta array (again, you'll need to construct this following the same parameter indexing you used for {\tt theta}), while the cost is a scalar representing the difference between the network output and training target.
+
+You will then implement the numerical gradient estimate in \\ {\tt gradient.compute\_gradient\_numerical\_estimate()}, using the EPSILON numerical gradient estimate error function.  Remember that for each parameter in the {\tt theta} array, you'll compute the estimated gradient of the objective function with respect to that parameter by varying just that parameter a little (+/- EPSILON) while keeping the other parameters constant.  EPSILON is set to 0.0001, and, as discussed in lecture, it is expected that the difference between the numerically estimated gradient and your gradient calculation in {\tt autoencoder\_cost\_and\_grad} will be very small (in my implementation the difference is around $10^{-9}$).
+
+To perform the test, set the {\tt RUN\_STEP\_4\_DEBUG\_GRADIENT} parameter on line 18 of {\tt train\_autoencoder.py} to {\tt True}; now when you run the script, it will run debugging code to check if your gradient is correct.  You might want to load fewer images in this step (i.e., select fewer columns in the {\tt patches} variable, say 10), and also reduce the hidden layer size (to say 2), so that you do not spend too much time waiting for all of the images to be processed (making these restrictions will still allow you to assess whether your gradient computation is correct); just remember to set you parameters back to their other values when you proceed to the next exercises.
+
+
+
+%%%     Exercise 4
+\item[4.] [2 points]
+Exercise 4: Implement feedforward as a stand-alone function {\tt autoencoder\_feedforward()} in {\tt utils.py}
+
+In the previous exercise it was necessary to implement a single function that computes the cost and gradient of your autoencoder so that we can use the fancy {\tt scipy.optimize.minimize} optimizer.  In the service of doing that, you had to implement the feedforward computation, where given an input you calculate the output activations at the output (visible) layer of your autoencoder.  In this exercise, you need to separate this functionality out into a standalone function so that you can visualize what your autoencoder is reproducing at the output layer given an input image.  We {\em could} actually have this function be called as part of your implementation of {\tt autoencoder\_cost\_and\_grad()}, but I have chosen to make this a separate, standalone function because likely you want your implementation of the feedforward step in {\tt autoencoder\_cost\_and\_grad()} to be as efficient as possible and I didn't want to introduce the extra constraint that feedforward in that implementation also had to be standalone (among other things, keeping track of the layer activations in feedforward allows them to be reused during backpropagation).
+
+To implement stand-alone feedforward, all you need to do is copy the code you wrote in\\ {\tt autoencoder\_cost\_and\_grad()} into the provided {\tt autoencoder\_feedforward()} stub in {\tt utils.py} and make it so it returns a matrix of activations.  Just like {\tt autoencoder\_cost\_and\_grad()}, this function takes a matrix where each column is a column vector representing an ``unrolled'' image patch, and there are 1 or more columns.  The return matrix of {\tt output\_activations} will have the same format, but now the columns represent the output activations corresponding to the input patches.  If you implemented your feedforward computation in {\tt autoencoder\_cost\_and\_grad()} so that it computes feedforward for each patch individually, that's fine -- now just take each output activation as a column vector and concatenate the column vectors into a matrix.  On the other hand, if you've already vectorized your feedforward computation, then you're likely done!
+
+The output of this function will then be used to display the activations as images, each corresponding to the first 100 patches in the image data.  This code will be used in the next exercise, after you've trained your autoencoder!
+
+
+
+%%%     Exercise 5
+\item[5.] [2 points]
+Exercise 5:  Use your autoencoder!
+
+If your gradient, as tested in Exercise 3, is sufficiently close to the numerical estimate, now you can train your autoencoder on the {\tt patches\_train}.  
+Keep the weight decay term, {\tt lambda\_}, set to 0.0001.
+
+Train your autoencoder with different sizes of hidden layer.  In particular, run the {\tt train\_autoencoder.py} script with hidden layers of (a) 10, (b) 50, (c) 100 and (d) 250.
+Try two different training sizes: the first 100 patches (the initial setting in the script), and also 1000 patches.
+
+Be aware that it will take a couple of minutes to run each training round, with the amount of time increasing as the number of hidden states increases (more parameters!).  Not surprisingly, training with 1000 training patches (as opposed to 100) will take 10-times as long to train.
+
+Also note that {\tt scipy.optimize.minimize} may report some errors or failures (possibly often).  This is generally OK; the only condition that is more concerning is when the `number of iterations' (reported in the verbose output of the {\tt scipy.optimize.minimize} function, after it has completed running) is very low, say less than 20, and the `message' is 'ABNORMAL\_TERMINATION\_IN\_LNSRCH'.  In this case, it means there is some inherent instability that prevented the optimizer from updating any useful amount.  This could be due to unlucky weight initialization, but more likely due to parameters interacting (this will be more prevalent in Exercise 6, when you implement the Sparse Autoencoder and try different {\tt rho\_} and {\tt beta\_} parameters).  When you get this, try running a couple more times (since it is only completing a few iterations, these runs don't take long) -- if you keep getting the same result, then it is safe to conclude that the parameters you're using are generally not conducive to training; just note this and move on to exploring other values.
+
+After each run, code is in place in {\tt train\_autoencoder.py} to call {\tt utils.plot\_and\_save\_results}; as described in the initial instructions, this will save your model parameters, generate the layer 1 weight images, and also call {\tt utils.autoencoder\_feedforward()} with both the first 100 training patches and the 100 test patches to see what your autoencoder reproduces.  The code currently defaults to save this using the same root pathname; you likely want to change the root pathname to something different for each run with different parameter settings, otherwise the output will be overwritten.
+
+Run each architecture (hidden layer sizes at 10, 50, 100 and 250), both for the 100 training patches, and the first 1000 training patches.  Include in your writeup the layer 1 weight images and train and test decode images.  Describe (in the image captions) the structure, if any, that you observe in each run.  Do you observe any trend or changes in the weight patterns as you change the hidden layer size?  How about the output activations for training and for testing?  How closely do they resemble the corresponding input patches?
+
+{\bf Solution:} 
+
+
+
+%%%     Exercise 6
+\item[6.] [8 points]
+Exercise 6: Sparse Autoencoder
+
+In this exercise you will now implement the function {\tt autoencoder\_cost\_and\_grad\_sparse()} in {\tt utils.py}.  For this, you will implement the sparsity penalty term as described in:\\
+\hspace{2cm}\url{http://ufldl.stanford.edu/wiki/index.php/Autoencoders_and_Sparsity}\\
+Most of the backpropagation algorithm you implemented in {\tt autoencoder\_cost\_and\_grad()} will remain exactly the same: you can copy your code from {\tt autoencoder\_cost\_and\_grad()} to use as your starting point for {\tt autoencoder\_cost\_and\_grad\_sparse()}.  Then follow the modifications describe in the above url (and covered in class) to add the sparsity penalty term to the cost and gradient computations.
+
+You can test your implementation by modifying the call under {\tt RUN\_STEP\_3} (line 137) to call \\ {\tt utils.autoencoder\_cost\_and\_grad\_sparse}, and then again setting {\tt RUN\_STEP\_3} and \\ {\tt RUN\_STEP\_4\_DEBUG\_GRADIENT} to {\tt True} to test the that the gradient is still being computed properly.
+
+With the added sparsity constraint, under certain network architectures you should now be able to induce more patterns in the first layer weight activations.
+
+Modify {\tt train\_autoencoder.py} Step 5 so that it now uses {\tt autoencoder\_cost\_and\_grad\_sparse()} to compute the new sparse-penalized cost and grad.
+
+Note that {\tt autoencoder\_cost\_and\_grad\_sparse()} includes two new parameters: $\rho$ ({\tt rho\_}), which determines the hidden layer activation limits imposed by the penalty, and $\beta$ ({\tt beta\_}), which governs that amount of penalty applied relative to the regular cost function.   
+
+You will train using the first 100 patches, and as in Exercise 5, you will keep {\tt lambda\_} at 0.0001 and try each of the three different hidden layer sizes: 10, 50, 100.  You will also need to experiment with values for {\tt rho\_} and {\tt beta\_}.  
+As a hint, try the following:
+
+For {\tt hidden\_size} = 10, try {\tt beta\_ = 0.2} with {\tt rho\_} = \{0.05, 0.01, 0.005\}\\
+For {\tt hidden\_size} = 50, try {\tt beta\_ = 0.1} with {\tt rho\_} = \{0.05, 0.01, 0.005\}\\
+For {\tt hidden\_size} = 100, try {\tt beta\_ = 0.01} with {\tt rho\_} = \{0.05, 0.01, 0.005\}\\
+Note that as you increase the number of nodes in the hidden layer, it is more effective to decrease {\tt beta\_}, which makes sense since as there are more hidden nodes, there collective impact becomes larger, so need to be discounted more.
+
+As in Exercise 5, report the patterns you see in both the weights as well as the output train and test decoding.  Describe what you see in the images.  Do you observe any general trends as you change the hidden layer size and corresponding sparsity parameters?  Explain how this compares to the images in exercise 5.
+
+{\bf Solution:} 
+
+
+
+
+\end{itemize}
+
+\end{document}
