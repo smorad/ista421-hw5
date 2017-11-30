@@ -11,7 +11,7 @@ import random
 
 
 # -------------------------------------------------------------------------
-
+@numpy.vectorize
 def sigmoid(x):
     return 1 / (1 + numpy.exp(-x))
 
@@ -75,20 +75,28 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     W2_index = W1_index + hidden_size * visible_size
     b1_index = W2_index + hidden_size
     b2_index = b1_index + visible_size
+    # hidden_size x visible_size
     W1 = numpy.matrix(theta[0:W1_index]).reshape((hidden_size, visible_size))
     W2 = numpy.matrix(theta[W1_index: W2_index]).reshape((visible_size, hidden_size))
-    b1 = numpy.array(theta[W2_index: b1_index])
-    b2 = numpy.array(theta[b1_index: b2_index])
+    b1 = numpy.matrix(theta[W2_index: b1_index]).reshape(1, hidden_size)
+    b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
     assert(b2_index == theta.shape[0])
 
     #print(W1.shape, patch.shape, b1.shape)
     print(data.shape[1])
+    print(matlib.repmat(b1, data.shape[1], 1).shape)
+    #b is hidden_size x 100:w
     #z2 = numpy.dot(W1.transpose(), data) 
-    z2 = W1 * data + matlib.repmat(b1, data.shape[1], 1)
-    print(z2.shape)
-    a2 = numpy.array([sigmoid(z) for z in z2])
-    z3 = W2 * a2
-    h = numpy.array([sigmoid(z) for z in z3])
+    z2 = W1 * data + numpy.repeat(b1, data.shape[1], axis=0).transpose()
+    print('z2', z2.shape)
+    #import ipdb; ipdb.set_trace()
+    a2 = sigmoid(z2)
+    print('a2', a2.shape)
+    z3 = W2 * a2 + numpy.repeat(b2, data.shape[1], axis=0).transpose()
+    #h = numpy.matrix([sigmoid(z) for z in z3])
+    h = sigmoid(z3)
+
+    print('z2, a2, z3, h', z2.shape, a2.shape, z3.shape, h.shape)
 
 # -------------------------------------------------------------------------
 
