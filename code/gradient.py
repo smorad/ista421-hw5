@@ -1,5 +1,4 @@
 import numpy
-import copy
 
 
 # -------------------------------------------------------------------------
@@ -38,16 +37,23 @@ def compute_gradient_numerical_estimate(J, theta, epsilon=0.0001):
     :return: array of numerical gradient estimate
     """
 
-    
+    cost, grad = J(theta)
+    print('cost and grad', cost, grad)
     grad = numpy.zeros(theta.shape)
-    y_1 = J(theta)
-    for i in range(theta):
+    for i in range(theta.shape[0]):
+        #print()
         # This is faster than a deepcopy
         old_elem = theta[i] 
         theta[i] = theta[i] + epsilon
-        y_2 = J(theta)
-        grad[i] = y_2 - y_1 / episilon
-        
+        new_cost, new_grad = J(theta)
+        # Extract grad from [cost, grad]
+        grad[i] = (new_cost - cost) / epsilon
+        #grad[i] = (y_2 - y_1[i]) / epsilon
+        # Replace with orig value
+        theta[i] = old_elem
+    
+    print('grad', grad)
+    return grad
 
 
 #        for param_x_idx, param_x in enumerate(param):
@@ -60,7 +66,6 @@ def compute_gradient_numerical_estimate(J, theta, epsilon=0.0001):
 #                gradient[i][j] = delta_y / epsilon
                 
 
-    return numpy.array(grad)
     #return gradient
 
 
@@ -82,7 +87,7 @@ def test_compute_gradient_numerical_estimate():
     print("    Testing that your implementation of ")
     print("        compute_gradient_numerical_estimate()")
     print("        is correct")
-    x = numpy.array([[4, 10]], dtype=numpy.float64)
+    x = numpy.array([4, 10], dtype=numpy.float64)
     (value, grad) = simple_quadratic_function(x)
 
     print("    Computing the numerical and actual gradient for 'simple_quadratic_function'")

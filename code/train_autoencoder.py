@@ -26,7 +26,7 @@ RUN_STEP_5_TRAIN_AUTOENCODER = False  # exercise 5, exercise 6
 # number of input units
 visible_size = 28 * 28
 # number of hidden units
-hidden_size = 50
+hidden_size = 2#50
 
 # desired average activation of the hidden units.
 # (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -50,7 +50,7 @@ lambda_ = 0.0001
 images = load_MNIST.load_MNIST_images('../data/train-images-idx3-ubyte')
 # Each column represents one 28x28 pixel image (784 total pixels) that has
 # been "unrolled" into a 784-element column vector.
-patches_train = images[:, 0:100]  # grabs the first 100 images (i.e., the first 100 columns)
+patches_train = images[:, 0:10]  # grabs the first 100 images (i.e., the first 100 columns)
 patches_test = images[:, 1200:1300]  # grabs 100 image patches that will be used for 'testing'
 
 #visualize.plot_images(patches_train[:, 0:100])
@@ -136,7 +136,7 @@ if RUN_STEP_4_DEBUG_GRADIENT:
     print("========== DEBUG: checking gradient ==========")
 
     # the following test your implementation of compute_gradient_numerical_estimate
-    #gradient.test_compute_gradient_numerical_estimate()
+    gradient.test_compute_gradient_numerical_estimate()
 
     # Now we can use it to check your cost function and derivative calculations
     # for the sparse autoencoder.

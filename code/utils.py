@@ -38,6 +38,7 @@ def initialize(hidden_size, visible_size):
     b2 = numpy.random.rand(visible_size).flatten()
 
     theta = numpy.concatenate((W1, W2, b1, b2))
+    print('theta shapes: ', W1.shape, W2.shape, b1.shape, b2.shape)
 
     assert(theta.shape[0] == 
             visible_size * hidden_size + 
@@ -52,7 +53,17 @@ def initialize(hidden_size, visible_size):
 
 
 
+@numpy.vectorize
+def loss(x, y):
+    return 0.5 * numpy.linalg.norm(x - y) ** 2
 
+@numpy.vectorize
+def hadamard_sq(x):
+    return x ** 2
+
+@numpy.vectorize
+def sigmoid_deriv(x):
+    return sigmoid(x) * (1 - sigmoid(x))
 # -------------------------------------------------------------------------
 
 def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
@@ -82,21 +93,51 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
     assert(b2_index == theta.shape[0])
 
-    #print(W1.shape, patch.shape, b1.shape)
-    print(data.shape[1])
-    print(matlib.repmat(b1, data.shape[1], 1).shape)
+    m = data.shape[1]
     #b is hidden_size x 100:w
-    #z2 = numpy.dot(W1.transpose(), data) 
-    z2 = W1 * data + numpy.repeat(b1, data.shape[1], axis=0).transpose()
-    print('z2', z2.shape)
-    #import ipdb; ipdb.set_trace()
+    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
     a2 = sigmoid(z2)
-    print('a2', a2.shape)
-    z3 = W2 * a2 + numpy.repeat(b2, data.shape[1], axis=0).transpose()
-    #h = numpy.matrix([sigmoid(z) for z in z3])
+    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
     h = sigmoid(z3)
+    cost = 1 / m * numpy.matrix.sum(loss(h, data))
+    weight_decay = 0.5 * lambda_ * (hadamard_sq(W1).sum() + hadamard_sq(W2).sum())
+    cost += weight_decay
+    print('cost ',cost)
 
-    print('z2, a2, z3, h', z2.shape, a2.shape, z3.shape, h.shape)
+    #print('z2, a2, z3, h', z2.shape, a2.shape, z3.shape, h.shape)
+
+    delta3 = numpy.multiply(-(data - h), sigmoid_deriv(z3))
+    delta2 = numpy.multiply(W2.T * delta3, sigmoid_deriv(z2))
+
+    del_W2 = (delta3 * (a2.T)).flatten()
+    del_W1 = (delta2 * (data.T)).flatten()
+
+    #print('del3', delta3.shape)
+
+    # Remove cols added to b1 and b2 by numpy.repeat
+    del_b2 = delta3[:,0]
+    del_b1 = delta2[:,0]
+
+    #print('del b2', del_b2.shape)
+
+    print(del_W1.shape, del_W2.shape, del_b1.shape, del_b2.shape)
+    grad = numpy.concatenate((
+        del_W1.T,
+        del_W2.T,
+        # b derivs are simply delta
+        del_b1,
+        del_b2
+    ))
+
+    # Verify shapes are good
+    # array.shape = (,num)
+    # mat.shape = (1,num)
+    assert(grad.shape[0] == theta.shape[0])
+
+    return cost, grad
+
+
+
 
 # -------------------------------------------------------------------------
 
