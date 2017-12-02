@@ -9,6 +9,7 @@ import gradient
 
 import random
 
+iter = 0
 
 # -------------------------------------------------------------------------
 @numpy.vectorize
@@ -27,15 +28,15 @@ def initialize(hidden_size, visible_size):
     """
 
     ### YOUR CODE HERE ###
-    # TODO change uniform range
+    u_range = - math.sqrt(6 / (visible_size * 2 + 1) )
     # visible to hidden
-    W1 = numpy.random.rand(visible_size, hidden_size).flatten()
+    W1 = numpy.random.uniform(-u_range, u_range, (visible_size, hidden_size)).flatten()
     # hidden to output
-    W2 = numpy.random.rand(hidden_size, visible_size).flatten()
+    W2 = numpy.random.uniform(-u_range, u_range, (hidden_size, visible_size)).flatten()
     # Hidden bias
-    b1 = numpy.random.rand(hidden_size).flatten()
+    b1 = numpy.random.uniform(-u_range, u_range, (hidden_size)).flatten()
     # Output bias
-    b2 = numpy.random.rand(visible_size).flatten()
+    b2 = numpy.random.uniform(-u_range, u_range, (visible_size)).flatten()
 
     theta = numpy.concatenate((W1, W2, b1, b2))
     print('theta shapes: ', W1.shape, W2.shape, b1.shape, b2.shape)
@@ -66,6 +67,48 @@ def sigmoid_deriv(x):
     return sigmoid(x) * (1 - sigmoid(x))
 # -------------------------------------------------------------------------
 
+def autoencoder_cost_and_grad_nonv(theta, visible_size, hidden_size, lambda_, data):
+    # Decompose vector into components
+    W1_index = visible_size * hidden_size
+    W2_index = W1_index + hidden_size * visible_size
+    b1_index = W2_index + hidden_size
+    b2_index = b1_index + visible_size
+    # hidden_size x visible_size
+    W1 = numpy.matrix(theta[0:W1_index]).reshape((hidden_size, visible_size))
+    W2 = numpy.matrix(theta[W1_index: W2_index]).reshape((visible_size, hidden_size))
+    b1 = numpy.matrix(theta[W2_index: b1_index]).reshape(1, hidden_size)
+    b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
+    assert(b2_index == theta.shape[0])
+    m = data.shape[1]
+
+
+    for i, x in enumerate(data.T):
+        x = numpy.matrix(x)
+        z2 = (W1 * x.transpose()).transpose() + b1
+        #print(W1.shape, x.transpose().shape, b1.shape)
+        print('z2', z2.shape)
+        a2 = sigmoid(z2)
+        z3 = W2 * a2[-1].transpose() + b2
+        h = sigmoid(z3)
+
+        cost = 1 / m * numpy.matrix.sum(loss(h, x))
+        weight_decay = 0.5 * lambda_ * (hadamard_sq(W1).sum() + hadamard_sq(W2).sum())
+        cost += weight_decay
+
+
+        delta3 = numpy.multiply(-(x - h), sigmoid_deriv(z3))
+        delta2 = numpy.multiply(W2.T * delta3, sigmoid_deriv(z2))
+
+        del_W2 = delta3 * (a2.T)
+        del_W1 = delta2 * (x.T)
+
+
+    print(a2.shape, h.shape)
+
+
+    return a2, h
+
+
 def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     """
     The input theta is a 1-dimensional array because scipy.optimize.minimize expects
@@ -92,19 +135,21 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     b1 = numpy.matrix(theta[W2_index: b1_index]).reshape(1, hidden_size)
     b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
     assert(b2_index == theta.shape[0])
-
     m = data.shape[1]
+
     #b is hidden_size x 100:w
     z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
     a2 = sigmoid(z2)
     z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
     h = sigmoid(z3)
-    cost = 1 / m * numpy.matrix.sum(loss(h, data))
-    weight_decay = 0.5 * lambda_ * (hadamard_sq(W1).sum() + hadamard_sq(W2).sum())
-    cost += weight_decay
-    print('cost ',cost)
 
-    #print('z2, a2, z3, h', z2.shape, a2.shape, z3.shape, h.shape)
+    # For the vectorized way of doing this, we will also need z2 and z3
+    # to calculate the gradient
+    #a2, h, z2, z3 = autoencoder_feedforward(theta, visible_size, hidden_size, data)
+    cost = 1 / m * numpy.matrix.sum(loss(h, data))
+    weight_decay = 0.5 * lambda_ * (numpy.square(W1).sum() + numpy.square(W2).sum())
+    cost += weight_decay
+
 
     delta3 = numpy.multiply(-(data - h), sigmoid_deriv(z3))
     delta2 = numpy.multiply(W2.T * delta3, sigmoid_deriv(z2))
@@ -112,15 +157,12 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     del_W2 = (delta3 * (a2.T)).flatten()
     del_W1 = (delta2 * (data.T)).flatten()
 
-    #print('del3', delta3.shape)
 
     # Remove cols added to b1 and b2 by numpy.repeat
     del_b2 = delta3[:,0]
     del_b1 = delta2[:,0]
 
-    #print('del b2', del_b2.shape)
 
-    print(del_W1.shape, del_W2.shape, del_b1.shape, del_b2.shape)
     grad = numpy.concatenate((
         del_W1.T,
         del_W2.T,
@@ -130,10 +172,9 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     ))
 
     # Verify shapes are good
-    # array.shape = (,num)
-    # mat.shape = (1,num)
     assert(grad.shape[0] == theta.shape[0])
 
+    #print('cost ', cost)
     return cost, grad
 
 
@@ -204,57 +245,29 @@ def autoencoder_feedforward(theta, visible_size, hidden_size, data):
     ### YOUR CODE HERE ###
     output_activations = None  # implement
 
-    print('theta', theta.shape)
-    print('w1', theta[0].shape)
-    print('w2', theta[1].shape)
+    # Decompose vector into components
+    W1_index = visible_size * hidden_size
+    W2_index = W1_index + hidden_size * visible_size
+    b1_index = W2_index + hidden_size
+    b2_index = b1_index + visible_size
+    # hidden_size x visible_size
+    W1 = numpy.matrix(theta[0:W1_index]).reshape((hidden_size, visible_size))
+    W2 = numpy.matrix(theta[W1_index: W2_index]).reshape((visible_size, hidden_size))
+    b1 = numpy.matrix(theta[W2_index: b1_index]).reshape(1, hidden_size)
+    b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
+    assert(b2_index == theta.shape[0])
+    m = data.shape[1]
 
-    W1 = theta[0]
-    W2 = theta[1]
-    b1 = theta[2]
-    b2 = theta[3]
+    #b is hidden_size x 100:w
+    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
+    a2 = sigmoid(z2)
+    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
+    h = sigmoid(z3)
+    print('act shapes', a2.shape, h.shape)
 
-    # node 1 in layer 2
-    # node activation is tan fn taking sum of input signals
-    #a_1_2 = sigmoid(sum([W1[i] for i in range(len(W1))]))
-    #a_2_2 = sigmoid(sum([W2[i] for i in range(len(W1))]))
-
-    # Layer 1
-    # Data is input layer activation
-    # prepopulate activation matrix
-    #for node in range(len(W1)):
-    #    layer1_activation.append(
-    #        sigmoid(sum([weight for weight in W1]))        
-    #    )
-
-    # Vectorized
-    patches = data.transpose()
-    #patch = data.transpose()[0]
-    print(len(patches), visible_size)
-#    l2_activations = numpy.zeros((len(patches), visible_size))
-#    l1_activations = numpy.zeros((hidden_size, visible_size))
-#    print(l1_activations.shape, W1.shape)
-#    for i, patch in enumerate(patches):
-#        l1_activation = sigmoid(numpy.dot(patch, W1) + b1)
-#        #l1_activations.append(l1_activation)
-#        l1_activations[i] = l1_activation
-#        l2_activations[i] = sigmoid(numpy.dot(l1_activation, W2) + b2)
-
-
-
-
-    l1_activations = numpy.zeros((visible_size, hidden_size))
-    l2_activations = numpy.zeros((hidden_size, visible_size))
-    print(l1_activations.shape, W1.shape)
-    for i, patch in enumerate(patches):
-        l1_activation = sigmoid(numpy.dot(patch, W1) + b1)
-        #l1_activations.append(l1_activation)
-        l1_activations[i] = l1_activation
-        l2_activations[i] = sigmoid(numpy.dot(l1_activation, W2) + b2)
-
-
-    #print(len(l1_activation), l1_activation[0].shape)
-
-    return l1_activations, l2_activations
+    #return numpy.matrix((a2, h))
+    #return a2, h, z2, z3
+    return h
 
     
 

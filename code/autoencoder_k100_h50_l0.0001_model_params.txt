@@ -1,0 +1,1 @@
+{'visible_size': 784, 'message': b'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH', 'hidden_size': 50, 'lambda_': 0.0001, 'nit': 353, 'success': True, 'train_time': 'days=00, h=02, m=59, s=7223'}

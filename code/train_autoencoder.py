@@ -13,10 +13,10 @@ import datetime
 # RUN_STEP_5_TRAIN_AUTOENCODER is True.
 
 RUN_STEP_1 = False # visualize patches, exercise 1
-RUN_STEP_2 = True # implement utils.initialize, exercise 2
-RUN_STEP_3 = True # implement utils.autoencoder_cost_and_grad{_sparse}, exercise 3 (first part), and revisit with exercise 6
+RUN_STEP_2 = False # implement utils.initialize, exercise 2
+RUN_STEP_3 = False # implement utils.autoencoder_cost_and_grad{_sparse}, exercise 3 (first part), and revisit with exercise 6
 RUN_STEP_4_DEBUG_GRADIENT = False # implement gradient.compute_gradient_numerical_estimate, exercise 3 (second), and revisit with exercise 6
-RUN_STEP_5_TRAIN_AUTOENCODER = False  # exercise 5, exercise 6
+RUN_STEP_5_TRAIN_AUTOENCODER = True # exercise 5, exercise 6
 
 # ======================================================================
 # Here we provide the relevant parameters values that will
@@ -26,7 +26,7 @@ RUN_STEP_5_TRAIN_AUTOENCODER = False  # exercise 5, exercise 6
 # number of input units
 visible_size = 28 * 28
 # number of hidden units
-hidden_size = 2#50
+hidden_size = 10
 
 # desired average activation of the hidden units.
 # (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -50,7 +50,7 @@ lambda_ = 0.0001
 images = load_MNIST.load_MNIST_images('../data/train-images-idx3-ubyte')
 # Each column represents one 28x28 pixel image (784 total pixels) that has
 # been "unrolled" into a 784-element column vector.
-patches_train = images[:, 0:10]  # grabs the first 100 images (i.e., the first 100 columns)
+patches_train = images[:, 0:100]  # grabs the first 100 images (i.e., the first 100 columns)
 patches_test = images[:, 1200:1300]  # grabs 100 image patches that will be used for 'testing'
 
 #visualize.plot_images(patches_train[:, 0:100])
@@ -152,12 +152,12 @@ if RUN_STEP_4_DEBUG_GRADIENT:
     # The following is for optional additional debugging
     # Uncomment the following to look at the individual differences for each parameter.
     # Sometimes this can be informative.
-    # for i in range(theta.shape[0]):
-    #     if i == (visible_size * hidden_size) \
-    #             or i == 2 * (visible_size * hidden_size)\
-    #             or i == 2 * (visible_size * hidden_size) + hidden_size:
-    #         print '======================='
-    #     print '{0} : {1} {2} {3}'.format(i, num_grad[i] / 2 - grad[i], num_grad[i], grad[i])
+    for i in range(theta.shape[0]):
+        if i == (visible_size * hidden_size) \
+                or i == 2 * (visible_size * hidden_size)\
+                or i == 2 * (visible_size * hidden_size) + hidden_size:
+            print('=======================')
+        print('{0} : {1} {2} {3}'.format(i, num_grad[i] / 2 - grad[i], num_grad[i], grad[i]))
 
     # Compare numerically computed gradients with the ones obtained from backpropagation
     diff = numpy.linalg.norm(num_grad - grad)

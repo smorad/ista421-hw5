@@ -38,35 +38,27 @@ def compute_gradient_numerical_estimate(J, theta, epsilon=0.0001):
     """
 
     cost, grad = J(theta)
-    print('cost and grad', cost, grad)
+    #print('cost and grad', cost, grad)
     grad = numpy.zeros(theta.shape)
     for i in range(theta.shape[0]):
-        #print()
-        # This is faster than a deepcopy
+        if not i % 25:
+            print(i)
         old_elem = theta[i] 
-        theta[i] = theta[i] + epsilon
-        new_cost, new_grad = J(theta)
+        theta[i] = theta[i] - epsilon
+        left_cost, left_grad = J(theta)
+        # add back what we subtracted
+        theta[i] = theta[i] + 2 * epsilon
+        right_cost, right_grad = J(theta)
+        #print('costs', cost, new_cost)
+        #print('the grad', (new_cost - cost) / epsilon)
         # Extract grad from [cost, grad]
-        grad[i] = (new_cost - cost) / epsilon
-        #grad[i] = (y_2 - y_1[i]) / epsilon
+        grad[i] = (right_cost - left_cost) / (2 * epsilon)
         # Replace with orig value
         theta[i] = old_elem
     
     print('grad', grad)
     return grad
 
-
-#        for param_x_idx, param_x in enumerate(param):
-#            for param_y_idx, param_y in enumerate(param):
-#                new_param_val = epsilon + param_val 
-#                new_param = copy.deepcopy(param)
-#                print(param.shape)
-#                param[i][j] = new_param
-#                delta_y = J(new_theta)[0] - J(theta)[0]
-#                gradient[i][j] = delta_y / epsilon
-                
-
-    #return gradient
 
 
 # -------------------------------------------------------------------------
