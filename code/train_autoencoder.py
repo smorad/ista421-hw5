@@ -26,7 +26,7 @@ RUN_STEP_5_TRAIN_AUTOENCODER = True # exercise 5, exercise 6
 # number of input units
 visible_size = 28 * 28
 # number of hidden units
-hidden_size = 10
+hidden_size = 250
 
 # desired average activation of the hidden units.
 # (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -50,7 +50,7 @@ lambda_ = 0.0001
 images = load_MNIST.load_MNIST_images('../data/train-images-idx3-ubyte')
 # Each column represents one 28x28 pixel image (784 total pixels) that has
 # been "unrolled" into a 784-element column vector.
-patches_train = images[:, 0:100]  # grabs the first 100 images (i.e., the first 100 columns)
+patches_train = images[:, 0:1000]  # grabs the first 100 images (i.e., the first 100 columns)
 patches_test = images[:, 1200:1300]  # grabs 100 image patches that will be used for 'testing'
 
 #visualize.plot_images(patches_train[:, 0:100])
@@ -146,7 +146,12 @@ if RUN_STEP_4_DEBUG_GRADIENT:
     print('    Total number of parameters, theta.shape= {0}'.format(theta.shape))
 
     # define the objective function that returns cost and grad, used by scipy.optimizze.minimize
-    J = lambda x: utils.autoencoder_cost_and_grad(x, visible_size, hidden_size, lambda_, patches_train)
+    beta_ = 0.2
+    rho_ = 0.5
+    #J = lambda x: utils.autoencoder_cost_and_grad_sparse(
+    #    x, visible_size, hidden_size, lambda_, rho_, beta_, patches_train)
+    J = lambda x: utils.autoencoder_cost_and_grad(
+        x, visible_size, hidden_size, lambda_, patches_train)
     num_grad = gradient.compute_gradient_numerical_estimate(J, theta)
 
     # The following is for optional additional debugging
@@ -182,6 +187,8 @@ if RUN_STEP_5_TRAIN_AUTOENCODER:
     start_time = datetime.datetime.now()
     print("    START TIME {0}".format(utils.get_pretty_time_string(start_time)))
     # define the objective function that returns cost and grad, used by scipy.optimizze.minimize
+    import cProfile
+    cProfile.run("utils.autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, patches_train)")
     J = lambda x: utils.autoencoder_cost_and_grad(x, visible_size, hidden_size, lambda_, patches_train)
     options_ = {'maxiter': 4000, 'disp': False}
     result = scipy.optimize.minimize(J, theta, method='L-BFGS-B', jac=True, options=options_)
@@ -214,8 +221,8 @@ if RUN_STEP_5_TRAIN_AUTOENCODER:
          show_p=False,
          # Everything after this point is stored as a dictionary in the 'params' argument:
          lambda_=lambda_,
-         # rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
-         # beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
+         #rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
+         #beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
          train_time=time_elapsed_string,
          nit=result.nit,
          success=result.success,

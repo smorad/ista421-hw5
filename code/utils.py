@@ -12,7 +12,7 @@ import random
 iter = 0
 
 # -------------------------------------------------------------------------
-@numpy.vectorize
+#@numpy.vectorize
 def sigmoid(x):
     return 1 / (1 + numpy.exp(-x))
 
@@ -54,17 +54,24 @@ def initialize(hidden_size, visible_size):
 
 
 
-@numpy.vectorize
+#@numpy.vectorize
+#def loss(x, y):
+#    return 0.5 * numpy.linalg.norm(x - y) ** 2
+
 def loss(x, y):
-    return 0.5 * numpy.linalg.norm(x - y) ** 2
+    # Above loss function was too slow at 0.5s per autoencoder_cost call
+    # based on https://github.com/danluu/UFLDL-tutorial/blob/master/common/sparseAutoencoderCost.m
+    # because it's much faster
+    error = x - y
+    error_term = 0.5 * numpy.square(error)
+    return error_term
 
-@numpy.vectorize
-def hadamard_sq(x):
-    return x ** 2
-
-@numpy.vectorize
+#@numpy.vectorize
 def sigmoid_deriv(x):
-    return sigmoid(x) * (1 - sigmoid(x))
+    # Inline as vectorize adds like 3 function calls worth of overhead
+    sig = 1 / (1 + numpy.exp(-x))
+    return numpy.multiply(sig, (1 - sig))
+    #return sigmoid(x) * (1 - sigmoid(x))
 # -------------------------------------------------------------------------
 
 def autoencoder_cost_and_grad_nonv(theta, visible_size, hidden_size, lambda_, data):
@@ -92,7 +99,7 @@ def autoencoder_cost_and_grad_nonv(theta, visible_size, hidden_size, lambda_, da
         h = sigmoid(z3)
 
         cost = 1 / m * numpy.matrix.sum(loss(h, x))
-        weight_decay = 0.5 * lambda_ * (hadamard_sq(W1).sum() + hadamard_sq(W2).sum())
+        weight_decay = 0.5 * lambda_ * (numpy.square(W1).sum() + numpy.square(W2).sum())
         cost += weight_decay
 
 
@@ -146,7 +153,7 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     # For the vectorized way of doing this, we will also need z2 and z3
     # to calculate the gradient
     #a2, h, z2, z3 = autoencoder_feedforward(theta, visible_size, hidden_size, data)
-    cost = 1 / m * numpy.matrix.sum(loss(h, data))
+    cost = numpy.matrix.sum(loss(h, data)) / m
     weight_decay = 0.5 * lambda_ * (numpy.square(W1).sum() + numpy.square(W2).sum())
     cost += weight_decay
 
@@ -200,8 +207,76 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     """
 
     ### YOUR CODE HERE ###
-    cost, grad = None, None  # implement
+    # Decompose vector into components
+    W1_index = visible_size * hidden_size
+    W2_index = W1_index + hidden_size * visible_size
+    b1_index = W2_index + hidden_size
+    b2_index = b1_index + visible_size
+    # hidden_size x visible_size
+    W1 = numpy.matrix(theta[0:W1_index]).reshape((hidden_size, visible_size))
+    W2 = numpy.matrix(theta[W1_index: W2_index]).reshape((visible_size, hidden_size))
+    b1 = numpy.matrix(theta[W2_index: b1_index]).reshape(1, hidden_size)
+    b2 = numpy.matrix(theta[b1_index: b2_index]).reshape(1, visible_size)
+    assert(b2_index == theta.shape[0])
+    m = data.shape[1]
 
+    #b is hidden_size x 100:w
+    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
+    a2 = sigmoid(z2)
+    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
+    h = sigmoid(z3)
+
+    cost = 1 / m * numpy.matrix.sum(loss(h, data))
+    weight_decay = 0.5 * lambda_ * (numpy.square(W1).sum() + numpy.square(W2).sum())
+    cost += weight_decay
+
+    # kl divergence
+    # need to get p_hat close to p
+    # rho_hats is mean activation for final layer
+    rho_hats = (1 / m) * numpy.sum(h, axis=1)
+
+    print('first cost', cost)
+    kl = numpy.sum(
+        rho_ 
+        * numpy.log(rho_/rho_hats) + 
+        (1-rho_) * 
+        numpy.log((1-rho_)/(1-rho_hats)))
+
+    # For the vectorized way of doing this, we will also need z2 and z3
+    # to calculate the gradient
+    #a2, h, z2, z3 = autoencoder_feedforward(theta, visible_size, hidden_size, data)
+
+    # Add kl div cost
+    cost += beta_ * kl
+
+    print(rho_hats.shape, data.shape, kl.shape)
+    delta_kl_term = beta_ * ( - (rho_ / rho_hats) + ((1 - rho_) / (1 - rho_hats)))
+
+    delta3 = numpy.multiply(-(data - h) + delta_kl_term, sigmoid_deriv(z3))
+    print('rhos', rho_, rho_hats.shape, delta_kl_term.shape, (W2.T*delta3).shape)
+    delta2 = numpy.multiply(W2.T * delta3 + delta_kl_term, sigmoid_deriv(z2))
+
+    del_W2 = (delta3 * (a2.T)).flatten()
+    del_W1 = (delta2 * (data.T)).flatten()
+
+
+    # Remove cols added to b1 and b2 by numpy.repeat
+    del_b2 = delta3[:,0]
+    del_b1 = delta2[:,0]
+
+
+    grad = numpy.concatenate((
+        del_W1.T,
+        del_W2.T,
+        # b derivs are simply delta
+        del_b1,
+        del_b2
+    ))
+
+    # Verify shapes are good
+    assert(grad.shape[0] == theta.shape[0])
+
+    #print('cost ', cost)
     return cost, grad
 
 

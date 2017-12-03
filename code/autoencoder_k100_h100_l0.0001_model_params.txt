@@ -1,0 +1,1 @@
+{'train_time': 'days=00, h=06, m=10, s=21650', 'visible_size': 784, 'success': False, 'lambda_': 0.0001, 'message': b'ABNORMAL_TERMINATION_IN_LNSRCH', 'nit': 533, 'hidden_size': 100}
