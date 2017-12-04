@@ -13,10 +13,10 @@ import datetime
 # RUN_STEP_5_TRAIN_AUTOENCODER is True.
 
 RUN_STEP_1 = False # visualize patches, exercise 1
-RUN_STEP_2 = False # implement utils.initialize, exercise 2
-RUN_STEP_3 = False # implement utils.autoencoder_cost_and_grad{_sparse}, exercise 3 (first part), and revisit with exercise 6
-RUN_STEP_4_DEBUG_GRADIENT = False # implement gradient.compute_gradient_numerical_estimate, exercise 3 (second), and revisit with exercise 6
-RUN_STEP_5_TRAIN_AUTOENCODER = True # exercise 5, exercise 6
+RUN_STEP_2 = False# implement utils.initialize, exercise 2
+RUN_STEP_3 = False# implement utils.autoencoder_cost_and_grad{_sparse}, exercise 3 (first part), and revisit with exercise 6
+RUN_STEP_4_DEBUG_GRADIENT = False# implement gradient.compute_gradient_numerical_estimate, exercise 3 (second), and revisit with exercise 6
+RUN_STEP_5_TRAIN_AUTOENCODER = True# exercise 5, exercise 6
 
 # ======================================================================
 # Here we provide the relevant parameters values that will
@@ -26,7 +26,7 @@ RUN_STEP_5_TRAIN_AUTOENCODER = True # exercise 5, exercise 6
 # number of input units
 visible_size = 28 * 28
 # number of hidden units
-hidden_size = 250
+hidden_size = 50
 
 # desired average activation of the hidden units.
 # (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -50,7 +50,7 @@ lambda_ = 0.0001
 images = load_MNIST.load_MNIST_images('../data/train-images-idx3-ubyte')
 # Each column represents one 28x28 pixel image (784 total pixels) that has
 # been "unrolled" into a 784-element column vector.
-patches_train = images[:, 0:1000]  # grabs the first 100 images (i.e., the first 100 columns)
+patches_train = images[:, 0:100]  # grabs the first 100 images (i.e., the first 100 columns)
 patches_test = images[:, 1200:1300]  # grabs 100 image patches that will be used for 'testing'
 
 #visualize.plot_images(patches_train[:, 0:100])
@@ -189,7 +189,10 @@ if RUN_STEP_5_TRAIN_AUTOENCODER:
     # define the objective function that returns cost and grad, used by scipy.optimizze.minimize
     import cProfile
     cProfile.run("utils.autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, patches_train)")
-    J = lambda x: utils.autoencoder_cost_and_grad(x, visible_size, hidden_size, lambda_, patches_train)
+    # J = lambda x: utils.autoencoder_cost_and_grad(x, visible_size, hidden_size, lambda_, patches_train)
+    beta_ = 0.2
+    rho_ = 0.5
+    J = lambda x: utils.autoencoder_cost_and_grad_sparse(x, visible_size, hidden_size, lambda_, beta_, rho_, patches_train)
     options_ = {'maxiter': 4000, 'disp': False}
     result = scipy.optimize.minimize(J, theta, method='L-BFGS-B', jac=True, options=options_)
     opt_theta = result.x  # theta found after optimization
@@ -221,8 +224,8 @@ if RUN_STEP_5_TRAIN_AUTOENCODER:
          show_p=False,
          # Everything after this point is stored as a dictionary in the 'params' argument:
          lambda_=lambda_,
-         #rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
-         #beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
+         rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
+         beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
          train_time=time_elapsed_string,
          nit=result.nit,
          success=result.success,

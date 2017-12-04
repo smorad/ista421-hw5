@@ -233,7 +233,7 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     # kl divergence
     # need to get p_hat close to p
     # rho_hats is mean activation for final layer
-    rho_hats = (1 / m) * numpy.sum(h, axis=1)
+    rho_hats = (1 / m) * numpy.sum(a2, axis=1)
 
     print('first cost', cost)
     kl = numpy.sum(
@@ -252,9 +252,14 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     print(rho_hats.shape, data.shape, kl.shape)
     delta_kl_term = beta_ * ( - (rho_ / rho_hats) + ((1 - rho_) / (1 - rho_hats)))
 
-    delta3 = numpy.multiply(-(data - h) + delta_kl_term, sigmoid_deriv(z3))
-    print('rhos', rho_, rho_hats.shape, delta_kl_term.shape, (W2.T*delta3).shape)
-    delta2 = numpy.multiply(W2.T * delta3 + delta_kl_term, sigmoid_deriv(z2))
+    #delta3 = numpy.multiply(-(data - h) + delta_kl_term, sigmoid_deriv(z3))
+    delta3 = numpy.multiply(-(data - h),  sigmoid_deriv(z3))
+    print('rhos', rho_, rho_hats.shape, delta_kl_term.shape, (W2.T*delta3).shape, W2.T.shape, delta3.shape)
+    delta2 = numpy.multiply(
+        W2.T * delta3 + 
+        delta_kl_term, 
+        sigmoid_deriv(z2)
+    )
 
     del_W2 = (delta3 * (a2.T)).flatten()
     del_W1 = (delta2 * (data.T)).flatten()
