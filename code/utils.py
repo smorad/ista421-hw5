@@ -451,6 +451,7 @@ def plot_and_save_results(theta, visible_size, hidden_size, root_filepath=None,
         if root_filepath:
             filepath = root_filepath + '_' + filepath
         train_decode = autoencoder_feedforward(theta, visible_size, hidden_size, train_patches)
+        train_decode = train_decode[-1]
         visualize.plot_images(train_decode, show_p=False, filepath=filepath)
 
     if test_patches is not None:
@@ -459,6 +460,7 @@ def plot_and_save_results(theta, visible_size, hidden_size, root_filepath=None,
         # Again, you can then manually compare the decoded patches to the test_patches
         # given as input.
         test_decode = autoencoder_feedforward(theta, visible_size, hidden_size, test_patches)
+        test_decode = train_decode[-1]
         filepath = 'test_decode.png'
         if root_filepath:
             filepath = root_filepath + '_' + filepath
