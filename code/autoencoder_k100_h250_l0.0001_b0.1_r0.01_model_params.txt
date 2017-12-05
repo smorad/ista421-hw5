@@ -1,0 +1,1 @@
+{'beta_': 0.1, 'rho_': 0.01, 'success': False, 'train_time': 'days=00, h=00, m=06, s=03', 'nit': 360, 'visible_size': 784, 'message': b'ABNORMAL_TERMINATION_IN_LNSRCH', 'hidden_size': 250, 'lambda_': 0.0001}

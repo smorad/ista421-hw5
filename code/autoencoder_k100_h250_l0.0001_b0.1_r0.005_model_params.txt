@@ -1,0 +1,1 @@
+{'beta_': 0.1, 'rho_': 0.005, 'success': True, 'train_time': 'days=00, h=00, m=07, s=05', 'nit': 331, 'visible_size': 784, 'message': b'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH', 'hidden_size': 250, 'lambda_': 0.0001}

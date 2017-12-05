@@ -26,7 +26,7 @@ RUN_STEP_5_TRAIN_AUTOENCODER = True# exercise 5, exercise 6
 # number of input units
 visible_size = 28 * 28
 # number of hidden units
-hidden_size = 50
+hidden_size = 250
 
 # desired average activation of the hidden units.
 # (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -147,7 +147,7 @@ if RUN_STEP_4_DEBUG_GRADIENT:
 
     # define the objective function that returns cost and grad, used by scipy.optimizze.minimize
     beta_ = 0.2
-    rho_ = 0.5
+    rho_ = 0.05
     #J = lambda x: utils.autoencoder_cost_and_grad_sparse(
     #    x, visible_size, hidden_size, lambda_, rho_, beta_, patches_train)
     J = lambda x: utils.autoencoder_cost_and_grad(
@@ -190,44 +190,47 @@ if RUN_STEP_5_TRAIN_AUTOENCODER:
     import cProfile
     cProfile.run("utils.autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, patches_train)")
     # J = lambda x: utils.autoencoder_cost_and_grad(x, visible_size, hidden_size, lambda_, patches_train)
-    beta_ = 0.2
-    rho_ = 0.5
-    J = lambda x: utils.autoencoder_cost_and_grad_sparse(x, visible_size, hidden_size, lambda_, beta_, rho_, patches_train)
-    options_ = {'maxiter': 4000, 'disp': False}
-    result = scipy.optimize.minimize(J, theta, method='L-BFGS-B', jac=True, options=options_)
-    opt_theta = result.x  # theta found after optimization
+    for beta_ in [0.01, 0.1, 0.2]:
+        for rho_ in [0.05, 0.01, 0.005]:
 
-    end_time = datetime.datetime.now()
-    print("    END TIME {0}".format(utils.get_pretty_time_string(end_time)))
-    total_time = end_time - start_time
-    time_elapsed_string = utils.get_pretty_time_string(total_time, delta=True)
-    print("    Total run time: {0}".format(time_elapsed_string))
+            J = lambda x: utils.autoencoder_cost_and_grad_sparse(x, visible_size, hidden_size, lambda_, beta_, rho_, patches_train)
+            options_ = {'maxiter': 4000, 'disp': False}
+            result = scipy.optimize.minimize(J, theta, method='L-BFGS-B', jac=True, options=options_)
+            opt_theta = result.x  # theta found after optimization
 
-    print("\nscipy.optimize.minimize() details:")
-    print(result)
+            end_time = datetime.datetime.now()
+            print("    END TIME {0}".format(utils.get_pretty_time_string(end_time)))
+            total_time = end_time - start_time
+            time_elapsed_string = utils.get_pretty_time_string(total_time, delta=True)
+            print("    Total run time: {0}".format(time_elapsed_string))
 
-    print("\nNOTE: Don't worry if scipy.optimize.minimize() reports 'success: False'")
-    print("      due to hitting the maximum iterations, or a message indicating an")
-    print("      error condition.  (nit = 'number of iterations')")
-    print("      I have set the max iterations to 4000, which is generally")
-    print("      sufficient for our purposes here.")
+            print("\nscipy.optimize.minimize() details:")
+            print(result)
 
-    # Step 6: Visualize and save results
+            print("\nNOTE: Don't worry if scipy.optimize.minimize() reports 'success: False'")
+            print("      due to hitting the maximum iterations, or a message indicating an")
+            print("      error condition.  (nit = 'number of iterations')")
+            print("      I have set the max iterations to 4000, which is generally")
+            print("      sufficient for our purposes here.")
 
-    results_filepath_root = 'autoencoder_k{0}_h{1}_l{2}'.format(patches_train.shape[1], hidden_size, lambda_)
+            # Step 6: Visualize and save results
 
-    utils.plot_and_save_results\
-        (opt_theta, visible_size, hidden_size,
-         root_filepath=results_filepath_root,
-         train_patches=patches_train[:, 0:100],  # only use the first 100 patches, or visualization may get messy
-         test_patches=patches_test,
-         show_p=False,
-         # Everything after this point is stored as a dictionary in the 'params' argument:
-         lambda_=lambda_,
-         rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
-         beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
-         train_time=time_elapsed_string,
-         nit=result.nit,
-         success=result.success,
-         message=result.message)
+            #results_filepath_root = 'autoencoder_k{0}_h{1}_l{2}'.format(patches_train.shape[1], hidden_size, lambda_)
+            results_filepath_root = 'autoencoder_k{0}_h{1}_l{2}_b{3}_r{4}'.format(
+                patches_train.shape[1], hidden_size, lambda_, beta_, rho_)
+
+            utils.plot_and_save_results\
+                (opt_theta, visible_size, hidden_size,
+                 root_filepath=results_filepath_root, 
+                 train_patches=patches_train[:, 0:100],  # only use the first 100 patches, or visualization may get messy
+                 test_patches=patches_test,
+                 show_p=False,
+                 # Everything after this point is stored as a dictionary in the 'params' argument:
+                 lambda_=lambda_,
+                 rho_=rho_,    # for when you implement utils.autoencoder_cost_and_grad_sparse
+                 beta_=beta_,  # for when you implement utils.autoencoder_cost_and_grad_sparse
+                 train_time=time_elapsed_string,
+                 nit=result.nit,
+                 success=result.success,
+                 message=result.message)
 

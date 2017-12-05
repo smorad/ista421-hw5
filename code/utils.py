@@ -144,11 +144,13 @@ def autoencoder_cost_and_grad(theta, visible_size, hidden_size, lambda_, data):
     assert(b2_index == theta.shape[0])
     m = data.shape[1]
 
-    #b is hidden_size x 100:w
-    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
-    a2 = sigmoid(z2)
-    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
-    h = sigmoid(z3)
+#    #b is hidden_size x 100:w
+#    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
+#    a2 = sigmoid(z2)
+#    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
+#    h = sigmoid(z3)
+#
+    z2, a2, z3, h = autoencoder_feedforward(theta, visible_size, hidden_size, data)
 
     # For the vectorized way of doing this, we will also need z2 and z3
     # to calculate the gradient
@@ -221,10 +223,13 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     m = data.shape[1]
 
     #b is hidden_size x 100:w
-    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
-    a2 = sigmoid(z2)
-    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
-    h = sigmoid(z3)
+#    z2 = W1 * data + numpy.repeat(b1, m, axis=0).transpose()
+#    a2 = sigmoid(z2)
+#    z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
+#    h = sigmoid(z3)
+
+
+    z2, a2, z3, h = autoencoder_feedforward(theta, visible_size, hidden_size, data)
 
     cost = 1 / m * numpy.matrix.sum(loss(h, data))
     weight_decay = 0.5 * lambda_ * (numpy.square(W1).sum() + numpy.square(W2).sum())
@@ -235,7 +240,7 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     # rho_hats is mean activation for final layer
     rho_hats = (1 / m) * numpy.sum(a2, axis=1)
 
-    print('first cost', cost)
+    #print('first cost', cost)
     kl = numpy.sum(
         rho_ 
         * numpy.log(rho_/rho_hats) + 
@@ -249,12 +254,12 @@ def autoencoder_cost_and_grad_sparse(theta, visible_size, hidden_size, lambda_, 
     # Add kl div cost
     cost += beta_ * kl
 
-    print(rho_hats.shape, data.shape, kl.shape)
+    #print(rho_hats.shape, data.shape, kl.shape)
     delta_kl_term = beta_ * ( - (rho_ / rho_hats) + ((1 - rho_) / (1 - rho_hats)))
 
     #delta3 = numpy.multiply(-(data - h) + delta_kl_term, sigmoid_deriv(z3))
     delta3 = numpy.multiply(-(data - h),  sigmoid_deriv(z3))
-    print('rhos', rho_, rho_hats.shape, delta_kl_term.shape, (W2.T*delta3).shape, W2.T.shape, delta3.shape)
+    #print('rhos', rho_, rho_hats.shape, delta_kl_term.shape, (W2.T*delta3).shape, W2.T.shape, delta3.shape)
     delta2 = numpy.multiply(
         W2.T * delta3 + 
         delta_kl_term, 
@@ -322,10 +327,6 @@ def autoencoder_feedforward(theta, visible_size, hidden_size, data):
                   vector of activations corresponding to the input data columns
     """
 
-    ### YOUR CODE HERE ###
-    output_activations = None  # implement
-
-    # Decompose vector into components
     W1_index = visible_size * hidden_size
     W2_index = W1_index + hidden_size * visible_size
     b1_index = W2_index + hidden_size
@@ -343,11 +344,10 @@ def autoencoder_feedforward(theta, visible_size, hidden_size, data):
     a2 = sigmoid(z2)
     z3 = W2 * a2 + numpy.repeat(b2, m, axis=0).transpose()
     h = sigmoid(z3)
-    print('act shapes', a2.shape, h.shape)
 
-    #return numpy.matrix((a2, h))
-    #return a2, h, z2, z3
-    return h
+    return z2, a2, z3, h
+
+
 
     
 
